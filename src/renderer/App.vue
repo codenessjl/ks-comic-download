@@ -1,0 +1,174 @@
+<template>
+  <v-app>
+    <!-- 侧边导航栏 -->
+    <v-navigation-drawer temporary app v-model="drawer">
+      <v-list>
+        <template v-for="(item, i) in items">
+          <v-list-tile @click="goTo(item.to)" :key="i">
+            <v-list-tile-action>
+              <v-icon>{{ item.icon }}</v-icon>
+            </v-list-tile-action>
+            <v-list-tile-content>
+              <v-list-tile-title>{{ item.text }}</v-list-tile-title>
+            </v-list-tile-content>
+          </v-list-tile>
+        </template>
+      </v-list>
+    </v-navigation-drawer>
+    <!-- 顶部工具条 -->
+    <v-toolbar app fixed dark :color="themeColor">
+      <v-toolbar-title class="ml-0 pl-2">
+        <v-toolbar-side-icon @click="drawer = !drawer"></v-toolbar-side-icon>
+        <span>KS漫画下载</span>
+      </v-toolbar-title>
+      <v-text-field 
+          dark
+          color="white"
+          class="mx-4 search-input"
+          tabindex="2"
+          v-model="searchName"
+          append-icon="search"
+          :append-icon-cb="searchComic"
+          @keypress.enter="searchComic"
+          placeholder="输入漫画名称" ></v-text-field>
+      <v-spacer class="hidden-sm-and-down"></v-spacer>
+      <div class="hidden-sm-and-down">
+        <v-tooltip bottom>
+          <v-btn icon slot="activator" @click="goTo('/')"><v-icon>home</v-icon></v-btn>
+          <span>首页</span>
+        </v-tooltip>
+        <v-tooltip bottom>
+          <v-btn icon slot="activator" @click="goTo('/userSetting')"><v-icon>settings</v-icon></v-btn>
+          <span>个性设置</span>
+        </v-tooltip>
+        <v-tooltip bottom>
+          <v-btn icon slot="activator"><v-icon>notifications</v-icon></v-btn>
+          <span>下载通知</span>
+        </v-tooltip>
+      </div>
+    </v-toolbar>
+    <main>
+      <v-content>
+        <v-container fluid fill-height>
+          <router-view></router-view>
+        </v-container>
+      </v-content>
+    </main>
+    <v-snackbar
+      :timeout="toastTimeout"
+      :color="toastColor"
+      v-model="toastShow"
+      >
+      {{toastText}}
+      <v-btn dark flat @click="closeToast">关闭</v-btn>
+    </v-snackbar>
+  </v-app>
+</template>
+
+<script>
+import {mapState} from 'vuex'
+import {ipcRenderer,remote} from 'electron'
+
+export default {
+  name: 'app',
+  data () {
+    return {
+      drawer: false,
+      items: [
+        { icon: 'home', text: '主页', to: '/index' },
+        { icon: 'file_download', text: '下载状态', to: '/downloadInfo' },
+        { icon: 'settings', text: '个性设置', to: '/userSetting' },
+        { icon: 'info', text: '项目介绍', to: '/projectInfo' },
+      ]
+    }
+  },
+  computed: {
+    ...mapState({
+      themeColor: state => state.setting.themeColor,
+      sourceName: state => state.setting.usingSourceName,
+      savePath: state => state.setting.savePath
+    }),
+    // toast相关属性
+    ...mapState('toast', {
+      toastColor: 'color',
+      toastText: 'text',
+      toastTimeout: 'timeout'
+    }),
+    toastShow: {
+      get () {
+        return this.$store.state.toast.show
+      },
+      set (value) {
+        if (!value) {
+          this.closeToast()
+        }
+      }
+    },
+    searchName: {
+      get () {
+        return this.$store.state.comic.searchName
+      },
+      set (value) {
+        this.$store.commit('comic/setSearchName', value)
+      }
+    }
+  },
+  methods: {
+    /**
+     * 搜索漫画
+     */
+    searchComic () {
+      if (!this.searchName) {
+        this.$store.dispatch('toast/show', {
+          color: 'error',
+          text: '漫画名称不能为空 '
+        })
+        return
+      }
+      // 切换到搜索页面
+      this.goTo({
+        path: '/searchList',
+        query: {
+          searchName: this.searchName
+        }
+      })
+    },
+    /**
+     * 切换路由
+     * @param {Object|String} route 路由对象
+     */
+    goTo (route) {
+      this.$router.push(route)
+    },
+    /**
+     * 关闭toast
+     */
+    closeToast () {
+      this.$store.dispatch('toast/close')
+    },
+    /**
+     * 初始化应用
+     */
+    init () {  
+      let comicSources = ipcRenderer.sendSync('getComicSources').data
+      this.$store.commit('comic/setComicSources', comicSources)
+      // 初始化用户设置
+      let userSetting = this.$ls.get('USER_SETTING')
+      this.$store.commit('setting/setUserSetting', userSetting)
+    }
+  },
+  created () {
+    this.init()
+  }
+}
+</script>
+
+<style>
+html, body {
+  font-family: Roboto, "lucida grande", "lucida sans unicode", lucida, helvetica, "Hiragino Sans GB", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
+  overflow-y: auto;
+}
+.search-input {
+  max-width: 400px;
+}
+</style>
