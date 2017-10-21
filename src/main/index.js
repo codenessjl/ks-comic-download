@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from 'electron'
+import { app, BrowserWindow, ipcMain, Tray } from 'electron'
 import fs from 'fs-extra'
 import path from 'path'
 import Spider from './spiders'
@@ -12,7 +12,7 @@ if (process.env.NODE_ENV !== 'development') {
   global.__static = require('path').join(__dirname, '/static').replace(/\\/g, '\\\\')
 }
 
-let mainWindow
+let mainWindow, appIcon
 const winURL = process.env.NODE_ENV === 'development'
   ? `http://localhost:9080`
   : `file://${__dirname}/index.html`
@@ -59,18 +59,40 @@ function bindIpcMain() {
     }
   })
   
-  ipcMain.on('getComicDetail', async (event, comic) => {
+  ipcMain.on('getComicSections', async (event, comic) => {
     try {
-      let detail = await spider.getComicDetail(comic)
-      event.sender.send('getComicDetail-res', utils.ipcMsg.success(detail))
+      let sections = await spider.getComicSections(comic)
+      event.sender.send('getComicSections-res', utils.ipcMsg.success(sections))
     } catch (err) {
-      event.sender.send('getComicDetail-res', utils.ipcMsg.failed('获取漫画章节信息失败'))
+      event.sender.send('getComicSections-res', utils.ipcMsg.failed('获取漫画章节信息失败'))
     }
   })
+
+  ipcMain.on('download', async (event, entity, savePath) => {
+    const sender = event.sender
+    const init = function init(sumNum) {
+      sender.send('download-init', utils.ipcMsg.success(sumNum))
+    }
+    const update = function update(downloadedNum) {
+      sender.send('download-progress', utils.ipcMsg.success(downloadedNum))
+    }
+    const finish = function finish() {
+      sender.send('download-finish', utils.ipcMsg.success(null))
+    }
+    // 生成存储文件夹
+    savePath = path.join(savePath, entity.comicName, entity.sectionTitle, entity.chapter.title)
+    await fs.ensureDir(savePath)
+    spider.downloadChapter(entity, savePath, {init, update, finish})
+  })
+}
+
+function initTray() {
+  appIcon = new Tray(path.join(__static, './icon.ico'))
 }
 
 app.on('ready', createWindow)
 app.on('ready', bindIpcMain)
+app.on('ready', initTray)
 app.on('ready', () => {
   const tempPath = utils.getTempDir()
   if (!fs.existsSync(tempPath)) {

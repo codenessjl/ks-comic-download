@@ -41,24 +41,44 @@
           <v-btn icon slot="activator" @click="goTo('/userSetting')"><v-icon>settings</v-icon></v-btn>
           <span>个性设置</span>
         </v-tooltip>
-        <v-tooltip bottom>
-          <v-btn icon slot="activator"><v-icon>notifications</v-icon></v-btn>
-          <span>下载通知</span>
-        </v-tooltip>
+        <!-- 下载完成消息 -->
+        <v-menu bottom left>
+          <v-btn icon slot="activator">
+            <v-badge right :color="`${themeColor} darken-3`" overlap>
+              <span slot="badge" dark v-if="notices.length > 0">{{notices.length}}</span>
+              <v-icon>notifications</v-icon>
+            </v-badge>
+          </v-btn>
+          <v-list dense>
+            <v-list-tile avatar v-for="(notice, index) in notices" :key="index">
+              <v-list-tile-avatar>
+                <v-avatar>{{ notice.coverUrl }}</v-avatar>
+              </v-list-tile-avatar>
+              <v-list-tile-content>
+                <v-list-tile-title>{{ notice.name }} 下载完成</v-list-tile-title>
+              </v-list-tile-content>
+              <v-list-tile-action>
+                <v-btn icon ripple v-electron-link.folder="notice.path">
+                  <v-icon color="grey lighten-1">folder</v-icon>
+                </v-btn>
+              </v-list-tile-action>
+            </v-list-tile>
+          </v-list>
+        </v-menu>
       </div>
     </v-toolbar>
-    <main>
+    <main :style="background">
       <v-content>
         <v-container fluid fill-height>
           <router-view></router-view>
         </v-container>
       </v-content>
     </main>
+    <!-- 提示信息框 -->
     <v-snackbar
       :timeout="toastTimeout"
       :color="toastColor"
-      v-model="toastShow"
-      >
+      v-model="toastShow">
       {{toastText}}
       <v-btn dark flat @click="closeToast">关闭</v-btn>
     </v-snackbar>
@@ -67,7 +87,6 @@
 
 <script>
 import {mapState} from 'vuex'
-import {ipcRenderer,remote} from 'electron'
 
 export default {
   name: 'app',
@@ -86,7 +105,8 @@ export default {
     ...mapState({
       themeColor: state => state.setting.themeColor,
       sourceName: state => state.setting.usingSourceName,
-      savePath: state => state.setting.savePath
+      savePath: state => state.setting.savePath,
+      notices: state => state.download.notices
     }),
     // toast相关属性
     ...mapState('toast', {
@@ -110,6 +130,13 @@ export default {
       },
       set (value) {
         this.$store.commit('comic/setSearchName', value)
+      }
+    },
+    background () {
+      let bgData = this.$store.getters['setting/backgroundImageData']
+      return {
+        // backgroundImage: `url('./static/background.jpg')`
+        backgroundImage: `url(${bgData})`
       }
     }
   },
@@ -149,8 +176,8 @@ export default {
     /**
      * 初始化应用
      */
-    init () {  
-      let comicSources = ipcRenderer.sendSync('getComicSources').data
+    init () {
+      let comicSources = this.$ipc.sendSync('getComicSources')
       this.$store.commit('comic/setComicSources', comicSources)
       // 初始化用户设置
       let userSetting = this.$ls.get('USER_SETTING')

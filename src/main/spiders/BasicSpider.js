@@ -39,26 +39,22 @@ export default class BasicSpider {
    * @property {Array<Chapter>} chapters - 章节数组
    */
   /**
-   * @typedef ComicDetail - 漫画对象
-   * @property {Array<Section>} section - 漫画章节分块对象数组,
-   */
-  /**
    * 通过漫画对象获取漫画章节信息
    * 
    * @async
    * @param {Comic} comic 
    * @memberof BasicSpider
-   * @returns {ComicDetail}
+   * @returns {Array<Section>}
    */
-  async getComicDetail (comic) {}
+  async getComicSections (comic) {}
 
   /**
    * 下载某章节漫画
    * 
-   * @param {Comic} comic 漫画内容对象
-   * @param {Object} chapter 章节内容对象
-   * @param {String} folderPath 下载绝对路径
+   * @param {DownloadEntity} entity 下载内容对象
+   * @param {String} savePath 下载路径
+   * @param {Object} operate {init, update, finish}
    * @memberof BasicSpider
    */
-  async downloadChapter (comic, chapter, folderPath) {}
+  async downloadChapter (entity, savePath, operate) {}
 }

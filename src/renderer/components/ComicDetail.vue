@@ -1,14 +1,14 @@
 <template>
-  <v-layout>
-    <v-progress-linear :indeterminate="true" :color="themeColor" v-if="loading"></v-progress-linear>
+  <v-layout row wrap>
+    <v-progress-linear indeterminate :color="themeColor" v-if="loading"></v-progress-linear>
     <v-flex v-else-if="comic != null" xs12>
       <v-btn flat :color="themeColor" :to="backRoute"><v-icon>keyboard_arrow_left</v-icon>返回列表</v-btn>
       <v-subheader>漫画信息</v-subheader>
-      <v-layout class="comic-main">
-        <v-flex xs5 sm4 md3 class="comic-cover ml-4">
+      <v-layout row warp class="comic-main">
+        <v-flex xs12 sm4 md3 class="comic-cover ml-4">
           <img :src="comic.coverUrl">
         </v-flex>
-        <v-flex xs5 offset-xs2 sm7 offset-sm1 md8 offset-md1>
+        <v-flex xs12 sm7 offset-sm1 md8 offset-md1>
           <v-flex class="mb-2" xs12>漫画名: {{comic.name}}</v-flex>
           <v-flex class="mb-2" xs12>作者: {{comic.author}}</v-flex>
           <v-flex class="mb-2" xs12>地区: {{comic.country}}</v-flex>
@@ -17,23 +17,25 @@
         </v-flex>
       </v-layout>
       <v-subheader>章节信息</v-subheader>
-      <v-tabs dark v-model="currentSection">
-        <v-tabs-bar :class="{[themeColor]: true}">
-          <v-tabs-slider class="yellow"></v-tabs-slider>
-          <v-tabs-item v-for="(section, index) in comic.detail" :key="index" :href="`#section-${index}`" ripple>{{section.sectionTitle}}</v-tabs-item>
-        </v-tabs-bar>
-        <v-tabs-items>
-          <v-tabs-content v-for="(section, index) in comic.detail" :key="index" :id="`section-${index}`">
-            <v-container fluid grid-list-md>
-              <v-layout row wrap>
-                <v-flex xs4 sm3 md2 v-for="(chapter, i) in section.chapters" :key="i">
-                  <v-checkbox :label="chapter.title" v-model="downloadGroup" :value="chapter" light></v-checkbox>
-                </v-flex>
-              </v-layout>
-            </v-container>
-          </v-tabs-content>
-        </v-tabs-items>
-      </v-tabs>
+      <v-flex xs12 v-if="!comic.sections" justify-center>
+        <v-progress-circular indeterminate :color="themeColor"></v-progress-circular>
+      </v-flex>
+      <v-flex v-else xs12 v-for="(section, iSection) in comic.sections" :key="iSection">
+        <v-card>
+          <v-btn class="btn-fr" :color="themeColor" @click="selectAllChapters(section.chapters)" flat>选择全部</v-btn>
+          <v-subheader>{{section.sectionTitle}}</v-subheader>
+          <v-container fluid grid-list-md>
+            <v-layout row wrap>
+              <v-flex xs4 sm3 md2 v-for="(chapter, iChapter) in section.chapters" :key="iChapter">
+                <v-checkbox :label="chapter.title" :input-value="chapter.selected" @change="toggleChapter(iSection, iChapter)" light></v-checkbox>
+              </v-flex>
+            </v-layout>
+          </v-container>
+        </v-card>
+      </v-flex>
+      <v-btn class="mr-4 mb-4" :color="themeColor" fab dark fixed bottom right @click="pushToDownloadList">
+        <v-icon>file_download</v-icon>
+      </v-btn>
     </v-flex>
     <h4 class="text-xs-center" v-else>找不到对应的漫画，请重新搜索</h4>
   </v-layout>
@@ -41,15 +43,14 @@
 
 <script>
 import {mapState, mapGetters} from 'vuex'
-import {ipcRenderer} from 'electron'
-
+/**
+ * @todo 主页（使用方法）编写
+ */
 export default {
   name: 'comic-detail',
   data () {
     return {
-      loading: false,
-      currentSection: null,
-      downloadGroup: []
+      loading: false
     }
   },
   computed: {
@@ -69,27 +70,49 @@ export default {
       }
     }
   },
+  methods: {
+    selectAllChapters (chapters) {
+      chapters.forEach((chapter) => {
+        chapter.selected = true
+      })
+    },
+    toggleChapter (iSection, iChapter) {
+      this.$store.commit('comic/toggleChapter', {
+        iSection,
+        iChapter
+      })
+    },
+    pushToDownloadList () {
+      this.comic.sections.forEach(section => {
+        let downloadChapters = []
+        section.chapters.forEach(chapter => {
+          if (chapter.selected) {
+            downloadChapters.push(chapter)
+          }
+        })
+        this.$store.dispatch('download/addDownloadSection', {
+          comicName: this.comic.name,
+          coverUrl: this.comic.coverUrl,
+          sectionTitle: section.sectionTitle,
+          chapters: downloadChapters
+        })
+      })
+    }
+  },
   created () {
     let currentWatchIndex = this.$store.state.comic.list.indexOf(this.$route.params.comic)
     this.$store.commit('comic/setCurrentWatchIndex', currentWatchIndex)
-    ipcRenderer.on('getComicDetail-res', (event, res) => {
-      if (res.success) {
-        this.$store.commit('comic/setComicDetail', res.data)
-      } else {
-        this.$store.dispatch('toast/show', {
-          color: 'error',
-          text: res.message
-        })
-      }
+    this.$ipc.on('getComicSections-res', ({ event, store, router }, data) => {
+      store.commit('comic/setComicSections', data)
     })
     this.$nextTick(() => {
-      if (this.comic && (!this.comic.detail || this.comic.detail.length === 0)) {
-        ipcRenderer.send('getComicDetail', this.comic)
+      if (this.comic && (!this.comic.sections || this.comic.sections.length === 0)) {
+        this.$ipc.send('getComicSections', this.comic)
       }
     })
   },
   beforeDestory () {
-    ipcRenderer.removeAllListeners('getComicDetail-res')
+    this.$ipc.clear('getComicSections-res')
   }
 }
 </script>
@@ -100,5 +123,8 @@ export default {
 }
 .comic-cover img {
   width: 100%;
+}
+.btn-fr {
+  float: right;
 }
 </style>

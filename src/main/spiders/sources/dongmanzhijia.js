@@ -102,6 +102,34 @@ export default class DMZJSpider extends BasicSpider {
   }
 
   /**
+   * 获取一个章节的漫画图片地址数组
+   * 
+   * @async
+   * @param {any} chapter 
+   * @returns {Promise<String[]>}
+   */
+  async getComicPicUrl (chapter) {
+    const {request, imgUrlPrefix} = this
+    const chapterURL = chapter.url
+    const res = await request.get(chapterURL)
+    if (!res.ok) {
+      throw new Error('无法获取该章节图片信息')
+    } else {
+      const $ = cheerio.load(res.text)
+      const script = $('script').eq(0).html()
+      // 获取当前章节的图片地址
+      let pageEvalStr = script.substring(script.indexOf('return p}') + 9, script.indexOf(',0,{}))') + 6)
+      pageEvalStr = eval('decodeImgUrl' + pageEvalStr)
+      pageEvalStr = pageEvalStr.substring(pageEvalStr.indexOf('['), pageEvalStr.lastIndexOf(']') + 1)
+      const pages = eval(pageEvalStr)
+      return pages.map((partURL) => {
+        return url.resolve(imgUrlPrefix, partURL)
+      })
+    }
+  }
+
+
+  /**
    * 
    * @override
    * @param {String} keyword 
@@ -142,7 +170,7 @@ export default class DMZJSpider extends BasicSpider {
    * @returns 
    * @memberof DMZJSpider
    */
-  async getComicDetail (comic) {
+  async getComicSections (comic) {
     const {request, webUrl, header} = this
     const res = await request.get(comic.siteUrl).set(header)
     if (res.ok) {
@@ -166,6 +194,61 @@ export default class DMZJSpider extends BasicSpider {
       return comicAllSections
     } else {
       throw new Error('获取漫画章节信息失败')
+    }
+  }
+
+  /**
+   * 下载单张图片
+   * 
+   * @param {String} folder 保存图片用路径
+   * @param {String} picUrl 图片网络地址
+   * @param {Function} finish async回调函数
+   * @returns 
+   */
+  async downLoad(folder, picUrl) {
+    const {request, imgHeader} = this
+    // 转化中文名称的图片名
+    const picName = decodeURI(picUrl.substring(picUrl.lastIndexOf('/') + 1))
+    const saveFile = path.join(folder, picName)
+    const exist = await fs.exists(saveFile)
+    if (exist) {
+      return
+    } else {
+      return new Promise((resolve, reject) => {
+        let stream = fs.createWriteStream(saveFile)
+        stream.on('close', () => {
+          resolve()
+        }).on('error', (err) => {
+          reject(err)
+        })
+        request.get(picUrl).set(imgHeader).pipe(stream)
+      })
+    }
+  }
+
+
+  /**
+   * 
+   * @override
+   * @param {any} entity 
+   * @param {any} savePath 
+   * @param {any} operate
+   * @memberof DMZJSpider
+   */
+  async downloadChapter (entity, savePath, operate) {
+    let current = 0
+    const chapterPicUrls = await this.getComicPicUrl(entity.chapter)
+    // 初始化下载图片数量
+    operate.init(chapterPicUrls.length)
+    for(let picUrl of chapterPicUrls) {
+      await this.downLoad(savePath, picUrl)
+      await utils.sleep(100)
+      current++
+      if (current < chapterPicUrls.length) {
+        operate.update(current)
+      } else {
+        operate.finish()
+      }
     }
   }
 }

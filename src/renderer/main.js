@@ -7,10 +7,11 @@ import router from './router'
 import store from './store'
 import VueLs from './plugins/storage'
 import ElectronLink from './plugins/v-electron-link'
+import IpcEvent from './plugins/ipcEvent'
 
 if (!process.env.IS_WEB) {
-  Vue.use(require('vue-electron'))
   Vue.use(ElectronLink)
+  Vue.use(IpcEvent)
 }
 Vue.config.productionTip = false
 

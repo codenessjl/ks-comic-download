@@ -25,13 +25,15 @@ function addLinkEvent(el, binding) {
     }
 
     if (modifiers.file) {
-      if (modifiers.inFolder) {
+      if (modifiers.folder) {
         // 打开文件所在文件夹
         shell.showItemInFolder(path.resolve(href))
       } else {
         // 用默认打开方式打开文件
         shell.openItem(path.resolve(href))
       }
+    } else if (modifiers.folder) {
+      shell.openItem(path.resolve(href))
     } else if (modifiers.toTrash) {
       // 移除到回收站
       shell.moveItemToTrash(path.resolve(href))

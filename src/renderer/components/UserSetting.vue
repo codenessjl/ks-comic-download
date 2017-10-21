@@ -1,7 +1,7 @@
 <template>
   <v-layout row wrap>
     <v-flex xs12>
-      <v-subheader><v-icon>color_lens</v-icon>配色主题</v-subheader>
+      <v-subheader><v-icon class="mr-2">color_lens</v-icon>配色主题</v-subheader>
       <v-avatar @click="setThemeColor(theme)" :key="theme" v-for="theme in supportThemes" :class="{[theme]: true,active: theme === themeColor}" class="mx-3 mb-3" :tile="true" :size="'32px'"></v-avatar>
     </v-flex>
     <v-flex xs10>
@@ -13,24 +13,35 @@
         single-line></v-select>
     </v-flex>
     <v-flex xs10>
-      <v-subheader>漫画保存路径</v-subheader>
+      <v-subheader><v-icon class="mr-2">folder_open</v-icon>漫画保存路径</v-subheader>
       <v-text-field
         readonly
         class="mx-3"
-        prepend-icon="folder_open"
         :color="themeColor"
         v-model="savePath"
         @click="setNewSavePath"></v-text-field>
     </v-flex>
+    <v-flex xs10>
+      <v-subheader><v-icon class="mr-2">photo</v-icon>背景图片</v-subheader>
+      <v-text-field
+        readonly
+        class="mx-3"
+        :color="themeColor"
+        v-model="backgroundImageSrc"
+        @click="setNewBackgroundImageSrc"></v-text-field>
+    </v-flex>
+    <v-flex xs12 class="ml-3">
+      <v-switch label="开启下载完成桌面提示" v-model="isNeedDesktopNotice">保存设置</v-switch>
+    </v-flex>
     <v-flex xs12>
-      <v-btn @click="saveUserSetting">保存设置</v-btn>
+      <v-btn dark :color="themeColor" @click="saveUserSetting">保存设置</v-btn>
     </v-flex>
   </v-layout>
 </template>
 
 <script>
 import {mapState} from 'vuex'
-import {ipcRenderer, remote} from 'electron'
+import {remote} from 'electron'
 export default {
   name: 'user-setting',
   data () {
@@ -61,6 +72,22 @@ export default {
       set (value) {
         this.$store.commit('setting/setSavePath', value)
       }
+    },
+    isNeedDesktopNotice: {
+      get () {
+        return this.$store.state.setting.isNeedDesktopNotice
+      },
+      set (value) {
+        this.$store.commit('setting/setDeskTopNotice', value)
+      }
+    },
+    backgroundImageSrc: {
+      get () {
+        return this.$store.state.setting.backgroundImageSrc
+      },
+      set (value) {
+        this.$store.commit('setting/setBackgroundImageSrc', value)
+      }
     }
   },
   methods: {
@@ -82,6 +109,24 @@ export default {
       }, (filePaths) => {
         if (filePaths && filePaths.length > 0) {
           this.savePath = filePaths[0]
+        }
+      })
+    },
+    setNewBackgroundImageSrc () {
+      remote.dialog.showOpenDialog({
+        //默认路径
+        // defaultPath: 'Desktop',
+        //选择操作，此处是打开文件夹
+        properties: [
+          'openFile',
+        ],
+        //过滤条件
+        filters: [
+          { name: 'All', extensions: ['png','jpg'] },
+        ]
+      }, (filePaths) => {
+        if (filePaths && filePaths.length > 0) {
+          this.backgroundImageSrc = filePaths[0]
         }
       })
     },

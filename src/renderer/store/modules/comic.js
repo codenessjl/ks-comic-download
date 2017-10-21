@@ -22,9 +22,6 @@ const mutations = {
   setList (state, list) {
     state.list = list
   },
-  clearList (state) {
-    state.list = []
-  },
   setComicSources (state, comicSources) {
     state.comicSources = comicSources
   },
@@ -35,11 +32,20 @@ const mutations = {
     state.latestSearchName = state.searchName
     state.searchName = ''
   },
-  setComicDetail (state, detail) {
-    Vue.set(state.list[state.currentWatchIndex], 'detail', detail)
+  setComicSections (state, sections) {
+    sections.forEach((section) => {
+      section.chapters.forEach((chapter) => {
+        chapter.selected = false
+      })
+    })
+    Vue.set(state.list[state.currentWatchIndex], 'sections', sections)
   },
   setCurrentWatchIndex (state, index) {
     state.currentWatchIndex = index
+  },
+  toggleChapter (state, {iSection, iChapter}) {
+    const chapter = state.list[state.currentWatchIndex].sections[iSection].chapters[iChapter]
+    chapter.selected = !chapter.selected
   }
 }
 

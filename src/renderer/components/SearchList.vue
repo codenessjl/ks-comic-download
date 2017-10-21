@@ -1,12 +1,12 @@
 <template>
   <v-layout wrap>
-    <v-progress-linear :indeterminate="true" :color="themeColor" v-if="loading"></v-progress-linear>
+    <v-progress-linear indeterminate :color="themeColor" v-if="loading"></v-progress-linear>
     <v-flex v-else-if="haveComic" xs12>
       <v-list three-line>
         <v-subheader>漫画列表</v-subheader>
         <v-container fluid grid-list-md>
           <v-layout row wrap>
-            <v-flex xs4 sm3 md2 v-for="(comic, index) in comicList" :key="index">
+            <v-flex xs6 sm4 md3 lg2 v-for="(comic, index) in comicList" :key="index">
               <div class="elevation-3 pa-2 comic-item">
                 <img class="comic-cover" :src="comic.coverUrl"/>
                 <router-link tag="h6" class="subheading comic-title text-xs-center mt-2" :class="{[themeColor + '--text']: true, 'text--darken-3': true}" :to="{name:'comic-detail', params: {comic}}">{{comic.name}}</router-link>
@@ -23,7 +23,7 @@
 
 <script>
 import {mapState} from 'vuex'
-import {ipcRenderer} from 'electron'
+
 export default {
   name: 'search-list',
   data () {
@@ -48,10 +48,9 @@ export default {
       let searchName = this.$route.query.searchName
       // 若关键字与当前保存的不同，则重新获取漫画列表
       if (searchName !== this.$store.state.comic.latestSearchName) {
-        this.$store.commit('comic/clearList')
         // 向主进程发送搜索请求
         this.loading = true
-        ipcRenderer.send('search', {
+        this.$ipc.send('search', {
           searchName: searchName,
           sourceName: this.$store.state.setting.usingSourceName
         })
@@ -66,15 +65,9 @@ export default {
   },
   created () {
     // 搜索结果事件
-    ipcRenderer.on('search-res', (event, response) => {
-      if (response.success) {
-        this.$store.commit('comic/setList', response.data)
-      } else {
-        this.$store.dispatch('toast/show', {
-          color: 'error',
-          text: response.message
-        })
-      }
+    this.$ipc.on('search-res', ({ event, store, router }, data) => {
+      store.commit('comic/setList', data)
+    }).finally(() => {
       this.loading = false
       this.$store.commit('comic/saveLatestSearchName')
     })
@@ -82,7 +75,7 @@ export default {
     this.fetchComicList()
   },
   beforeDestory () {
-    ipcRenderer.removeAllListeners('search-res')
+    this.$ipc.clear('search-res')
   }
 }
 </script>

@@ -2,11 +2,15 @@ import Vue from 'vue'
 import util from 'util'
 import { ls } from '../../plugins/storage'
 import path from 'path'
+import fs from 'fs-extra'
 
 const state = {
   themeColor: 'light-blue',
   usingSourceName: 'dongmanzhijia',
-  savePath: path.join(__static, '../download')
+  savePath: path.join(__static, '../download'),
+  //TODO: 桌面提示开关，背景图片
+  isNeedDesktopNotice: false,
+  backgroundImageSrc: path.join(__static, './background.jpg')
 }
 
 const getters = {
@@ -15,6 +19,10 @@ const getters = {
       return source.name === state.usingSourceName
     })
     return source
+  },
+  backgroundImageData (state) {
+    const ext = path.extname(state.backgroundImageSrc)
+    return `data:image/${ext === 'jpg' ? 'jpeg' : 'png'};base64,${fs.readFileSync(state.backgroundImageSrc).toString('base64')}`
   }
 }
 
@@ -27,6 +35,12 @@ const mutations = {
   },
   setSavePath (state, savePath) {
     state.savePath = savePath
+  },
+  setBackgroundImageSrc (state, backgroundImageSrc) {
+    state.backgroundImageSrc = backgroundImageSrc
+  },
+  setDeskTopNotice (state, isNeed) {
+    state.isNeedDesktopNotice = isNeed
   },
   setUserSetting (state, setting) {
     for (let key in setting) {
