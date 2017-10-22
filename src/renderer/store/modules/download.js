@@ -59,6 +59,9 @@ const mutations = {
         body: finished.name + '下载完毕'
       })
     }
+  },
+  clearNotices (state) {
+    state.notices = []
   }
 }
 

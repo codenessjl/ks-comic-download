@@ -3,54 +3,17 @@
     <v-subheader>软件使用步骤</v-subheader>
     <v-stepper non-linear class="bg-opacity" v-model="step">
       <v-stepper-header v-model="step">
-        <v-stepper-step step="1" editable>搜索漫画</v-stepper-step>
-        <v-divider></v-divider>
-        <v-stepper-step step="2" editable>下载章节</v-stepper-step>
-        <v-divider></v-divider>
-        <v-stepper-step step="3" editable>查看下载状态</v-stepper-step>
+        <template v-for="(stepper, index) in steppers">
+          <v-stepper-step :step="index + 1" :key="index" editable>{{stepper.header}}</v-stepper-step>
+          <v-divider v-if="index + 1 < steppers.length" :key="index"></v-divider>
+        </template>
       </v-stepper-header>
-      <v-stepper-content step="1">
+      <v-stepper-content :step="index + 1" v-for="(stepper, index) in steppers" :key="index">
         <v-layout class="step-item">
           <ol>
-            <li>
-              <p>在顶部的搜索框内输入要搜索的漫画的关键字</p>
-              <img class="step-img" :src="'static/step1-1.jpg'">
-            </li>
-            <li>
-              <p>选择你要下载的漫画</p>
-              <img class="step-img" :src="'static/step1-2.jpg'">
-            </li>
-          </ol>
-        </v-layout>
-      </v-stepper-content>
-      <v-stepper-content step="2">
-        <v-layout class="step-item">
-          <ol>
-            <li>
-              <p>选择要下载的漫画的章节</p>
-              <img class="step-img" :src="'static/step2-1.jpg'">
-            </li>
-            <li>
-              <p>点击下载按钮</p>
-              <img class="step-img" :src="'static/step2-2.jpg'">
-            </li>
-          </ol>
-        </v-layout>
-      </v-stepper-content>
-      <v-stepper-content step="3">
-        <v-layout class="step-item">
-          <ol>
-            <li>
-              <p>打开侧边栏</p>
-              <img class="step-img" :src="'static/step3-1.jpg'">
-            </li>
-            <li>
-              <p>选择“下载状态”</p>
-              <img class="step-img" :src="'static/step3-2.jpg'">
-            </li>
-            <li>
-              <p>查看下载进度信息</p>
-              <img class="step-img" :src="'static/step3-3.jpg'">
+            <li v-for="(content, cIndex) in stepper.contents" :key="cIndex">
+              <p>{{content.text}}</p>
+              <img class="step-img" :src="content.img">
             </li>
           </ol>
         </v-layout>
@@ -69,7 +32,38 @@ export default {
   name: 'usage-steps',
   data() {
     return {
-      step: 1
+      step: 1,
+      steppers: [{
+        header: '搜索漫画',
+        contents: [{
+          text: '在顶部的搜索框内输入要搜索的漫画的关键字',
+          img: 'static/step1-1.jpg'
+        }, {
+          text: '选择你要下载的漫画',
+          img: 'static/step1-2.jpg'
+        }]
+      }, {
+        header: '下载章节',
+        contents: [{
+          text: '选择要下载的漫画的章节',
+          img: 'static/step2-1.jpg'
+        }, {
+          text: '点击下载按钮',
+          img: 'static/step2-2.jpg'
+        }]
+      }, {
+        header: '查看下载状态',
+        contents: [{
+          text: '打开侧边栏',
+          img: 'static/step3-1.jpg'
+        }, {
+          text: '选择“下载状态”',
+          img: 'static/step3-2.jpg'
+        }, {
+          text: '查看下载进度信息',
+          img: 'static/step3-3.jpg'
+        }]
+      }]
     }
   },
   computed: {

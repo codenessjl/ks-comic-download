@@ -45,11 +45,13 @@
         <v-menu bottom left>
           <v-btn icon slot="activator">
             <v-badge right :color="`${themeColor} darken-3`" overlap>
-              <span slot="badge" dark v-if="notices.length > 0">{{notices.length}}</span>
+              <span slot="badge" dark v-if="haveNotice">{{notices.length}}</span>
               <v-icon>notifications</v-icon>
             </v-badge>
           </v-btn>
-          <v-list dense>
+          <v-list dense class="notice-list">
+            <v-subheader v-if="!haveNotice">暂无下载完成消息</v-subheader>
+            <v-btn absolute right icon flat v-show="haveNotice" @click="clearNotices"><v-icon>delete</v-icon></v-btn>
             <v-list-tile avatar v-for="(notice, index) in notices" :key="index">
               <v-list-tile-avatar>
                 <v-avatar><img :src="notice.coverUrl"></v-avatar>
@@ -142,6 +144,9 @@ export default {
         backgroundSize: 'cover',
         backgroundPosition: 'center'
       }
+    },
+    haveNotice () {
+      return this.notices.length > 0
     }
   },
   methods: {
@@ -176,6 +181,9 @@ export default {
      */
     closeToast () {
       this.$store.dispatch('toast/close')
+    },
+    clearNotices () {
+      this.$store.commit('download/clearNotices')
     },
     /**
      * 初始化应用
@@ -213,5 +221,10 @@ html, body {
 }
 .page-enter, .page-leave-to {
   opacity: 0;
+}
+.notice-list {
+  min-width: 200px;
+  min-height: 50px;
+  max-height: 90vh;
 }
 </style>
