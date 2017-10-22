@@ -4,11 +4,11 @@
     <v-flex v-else-if="comic != null" xs12>
       <v-btn flat :color="themeColor" :to="backRoute"><v-icon>keyboard_arrow_left</v-icon>返回列表</v-btn>
       <v-subheader>漫画信息</v-subheader>
-      <v-layout row warp class="comic-main">
+      <v-layout row wrap class="comic-main">
         <v-flex xs12 sm4 md3 class="comic-cover ml-4">
           <img :src="comic.coverUrl">
         </v-flex>
-        <v-flex xs12 sm7 offset-sm1 md8 offset-md1>
+        <v-flex xs12 sm6 offset-sm1 md7 offset-md1>
           <v-flex class="mb-2" xs12>漫画名: {{comic.name}}</v-flex>
           <v-flex class="mb-2" xs12>作者: {{comic.author}}</v-flex>
           <v-flex class="mb-2" xs12>地区: {{comic.country}}</v-flex>
@@ -21,7 +21,7 @@
         <v-progress-circular indeterminate :color="themeColor"></v-progress-circular>
       </v-flex>
       <v-flex v-else xs12 v-for="(section, iSection) in comic.sections" :key="iSection">
-        <v-card>
+        <v-card class="bg-opacity elevation-2">
           <v-btn class="btn-fr" :color="themeColor" @click="selectAllChapters(section.chapters)" flat>选择全部</v-btn>
           <v-subheader>{{section.sectionTitle}}</v-subheader>
           <v-container fluid grid-list-md>

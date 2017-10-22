@@ -239,7 +239,10 @@ export default class DMZJSpider extends BasicSpider {
     let current = 0
     const chapterPicUrls = await this.getComicPicUrl(entity.chapter)
     // 初始化下载图片数量
-    operate.init(chapterPicUrls.length)
+    operate.init({
+      sumNum: chapterPicUrls.length,
+      savePath: savePath
+    })
     for(let picUrl of chapterPicUrls) {
       await this.downLoad(savePath, picUrl)
       await utils.sleep(100)

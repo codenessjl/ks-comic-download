@@ -8,7 +8,7 @@
       <v-subheader>漫画源选择</v-subheader>
       <v-select 
         :items="comicSources"
-        class="mx-3"
+        class="mx-3 pt-1"
         v-model="usingSource"
         single-line></v-select>
     </v-flex>
@@ -16,7 +16,7 @@
       <v-subheader><v-icon class="mr-2">folder_open</v-icon>漫画保存路径</v-subheader>
       <v-text-field
         readonly
-        class="mx-3"
+        class="mx-3 pt-1"
         :color="themeColor"
         v-model="savePath"
         @click="setNewSavePath"></v-text-field>
@@ -25,7 +25,7 @@
       <v-subheader><v-icon class="mr-2">photo</v-icon>背景图片</v-subheader>
       <v-text-field
         readonly
-        class="mx-3"
+        class="mx-3 pt-1"
         :color="themeColor"
         v-model="backgroundImageSrc"
         @click="setNewBackgroundImageSrc"></v-text-field>

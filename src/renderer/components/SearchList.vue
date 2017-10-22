@@ -2,7 +2,7 @@
   <v-layout wrap>
     <v-progress-linear indeterminate :color="themeColor" v-if="loading"></v-progress-linear>
     <v-flex v-else-if="haveComic" xs12>
-      <v-list three-line>
+      <v-list class="bg-opacity elevation-2" three-line>
         <v-subheader>漫画列表</v-subheader>
         <v-container fluid grid-list-md>
           <v-layout row wrap>

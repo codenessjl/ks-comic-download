@@ -8,7 +8,6 @@ const state = {
   themeColor: 'light-blue',
   usingSourceName: 'dongmanzhijia',
   savePath: path.join(__static, '../download'),
-  //TODO: 桌面提示开关，背景图片
   isNeedDesktopNotice: false,
   backgroundImageSrc: path.join(__static, './background.jpg')
 }

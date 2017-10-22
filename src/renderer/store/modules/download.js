@@ -1,22 +1,25 @@
 import Vue from 'vue'
 import IpcEvent from '../../plugins/ipcEvent'
 import electron from 'electron'
+import path from 'path'
 
 class DownloadEntity {
-  constructor (source) {
+  constructor (entity) {
 
     // 下载列表是中显示的标题名
-    this.name = `${source.comicName} - ${source.sectionTitle} - ${source.chapter.title}`
+    this.name = `${entity.comicName} - ${entity.sectionTitle} - ${entity.chapter.title}`
     // 需要下载的图片总数
     this.sumNum = 0;
     // 已经下载的图片数
     this.downloadedNum = 0;
 
     // 漫画信息
-    this.comicName = source.comicName
-    this.coverUrl = source.coverUrl
-    this.sectionTitle = source.sectionTitle
-    this.chapter = source.chapter
+    this.comicName = entity.comicName
+    this.coverUrl = entity.coverUrl
+    this.sectionTitle = entity.sectionTitle
+    this.chapter = entity.chapter
+
+    this.savePath = ''
   }
 }
 
@@ -39,7 +42,8 @@ const mutations = {
   },
   initEntity (state, data) {
     const entity = state.list[0]
-    entity.sumNum = data
+    entity.sumNum = data.sumNum
+    entity.savePath = data.savePath
   },
   updateEntityProgress (state, data) {
     const entity = state.list[0]

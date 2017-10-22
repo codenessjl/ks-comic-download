@@ -52,13 +52,13 @@
           <v-list dense>
             <v-list-tile avatar v-for="(notice, index) in notices" :key="index">
               <v-list-tile-avatar>
-                <v-avatar>{{ notice.coverUrl }}</v-avatar>
+                <v-avatar><img :src="notice.coverUrl"></v-avatar>
               </v-list-tile-avatar>
               <v-list-tile-content>
                 <v-list-tile-title>{{ notice.name }} 下载完成</v-list-tile-title>
               </v-list-tile-content>
               <v-list-tile-action>
-                <v-btn icon ripple v-electron-link.folder="notice.path">
+                <v-btn icon ripple v-electron-link.folder="notice.savePath">
                   <v-icon color="grey lighten-1">folder</v-icon>
                 </v-btn>
               </v-list-tile-action>
@@ -67,10 +67,12 @@
         </v-menu>
       </div>
     </v-toolbar>
-    <main :style="background">
+    <main :style="appBackground">
       <v-content>
         <v-container fluid fill-height>
-          <router-view></router-view>
+          <transition name="page" appear mode="out-in">
+            <router-view></router-view>
+          </transition>
         </v-container>
       </v-content>
     </main>
@@ -98,7 +100,8 @@ export default {
         { icon: 'file_download', text: '下载状态', to: '/downloadInfo' },
         { icon: 'settings', text: '个性设置', to: '/userSetting' },
         { icon: 'info', text: '项目介绍', to: '/projectInfo' },
-      ]
+      ],
+      transitionName: 'page-left'
     }
   },
   computed: {
@@ -132,11 +135,12 @@ export default {
         this.$store.commit('comic/setSearchName', value)
       }
     },
-    background () {
-      let bgData = this.$store.getters['setting/backgroundImageData']
+    appBackground () {
+      const bgData = this.$store.getters['setting/backgroundImageData']
       return {
-        // backgroundImage: `url('./static/background.jpg')`
-        backgroundImage: `url(${bgData})`
+        backgroundImage: `url(${bgData})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center'
       }
     }
   },
@@ -197,5 +201,17 @@ html, body {
 }
 .search-input {
   max-width: 400px;
+}
+.bg-opacity {
+  background: rgba(255,255,255,0.65) !important;
+}
+.bg-opacity > table {
+  background: none !important;
+}
+.page-enter-active, .page-leave-active {
+  transition: all 0.3s ease 0s;
+}
+.page-enter, .page-leave-to {
+  opacity: 0;
 }
 </style>
