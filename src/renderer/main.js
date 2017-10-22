@@ -25,6 +25,3 @@ new Vue({
   store,
   template: '<App/>'
 }).$mount('#app')
-
-window.store = store
-window.router = router

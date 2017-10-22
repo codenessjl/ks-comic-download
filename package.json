@@ -1,6 +1,6 @@
 {
-  "name": "comic-gallery",
-  "version": "0.0.1",
+  "name": "ks-comic-download",
+  "version": "1.0.0",
   "author": "KainStar",
   "description": "a comic download app",
   "license": "",
@@ -17,8 +17,8 @@
     "postinstall": ""
   },
   "build": {
-    "productName": "comic-gallery",
-    "appId": "org.simulatedgreg.electron-vue",
+    "productName": "ks-comic-download",
+    "appId": "pers.kainstar.ks-comic-download",
     "directories": {
       "output": "build"
     },
@@ -79,6 +79,7 @@
     "electron-builder": "^19.19.1",
     "electron-debug": "^1.4.0",
     "electron-devtools-installer": "^2.2.0",
+    "electron-updater": "^2.13.0",
     "extract-text-webpack-plugin": "^3.0.0",
     "file-loader": "^0.11.2",
     "html-webpack-plugin": "^2.30.1",

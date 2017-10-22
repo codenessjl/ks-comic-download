@@ -1,4 +1,5 @@
 import { app, BrowserWindow, ipcMain, Tray } from 'electron'
+import { autoUpdater } from 'electron-updater'
 import fs from 'fs-extra'
 import path from 'path'
 import Spider from './spiders'
@@ -86,13 +87,8 @@ function bindIpcMain() {
   })
 }
 
-function initTray() {
-  appIcon = new Tray(path.join(__static, './icon.ico'))
-}
-
 app.on('ready', createWindow)
 app.on('ready', bindIpcMain)
-app.on('ready', initTray)
 app.on('ready', () => {
   const tempPath = utils.getTempDir()
   if (!fs.existsSync(tempPath)) {
@@ -125,9 +121,6 @@ app.on('activate', () => {
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-electron-builder.html#auto-updating
  */
 
-/*
-import { autoUpdater } from 'electron-updater'
-
 autoUpdater.on('update-downloaded', () => {
   autoUpdater.quitAndInstall()
 })
@@ -135,4 +128,3 @@ autoUpdater.on('update-downloaded', () => {
 app.on('ready', () => {
   if (process.env.NODE_ENV === 'production') autoUpdater.checkForUpdates()
 })
- */
