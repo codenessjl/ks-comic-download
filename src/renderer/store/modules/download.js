@@ -120,6 +120,14 @@ IpcEvent.on('download-finish', ({event, store, router}, data) => {
   }
 })
 
+IpcEvent.on('download-error', ({event, store, router}, data) => {
+  store.dispatch('toast/show', {
+    color: 'error',
+    text: '客户端出现了一个错误'
+  })
+  console.error(data)
+})
+
 export default {
   namespaced: true,
   state,

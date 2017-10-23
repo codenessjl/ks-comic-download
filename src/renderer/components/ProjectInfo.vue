@@ -5,7 +5,7 @@
         <v-card-title>
           <v-flex>
             <h5 class="text-xs-center">项目介绍</h5>
-            <p>作者：<a href="https://github.com/hzxszsk"v-electron-link>KainStar</a></p>
+            <p>作者：<a href="https://github.com/hzxszsk" v-electron-link>KainStar</a></p>
             <p>
               框架、UI库：
               <a href="https://electron.atom.io/docs/" v-electron-link>Electron</a>、
@@ -14,7 +14,7 @@
               <a href="https://router.vuejs.org/zh-cn/" v-electron-link>Vue-Router</a>、
               <a href="https://vuetifyjs.com/" v-electron-link>Vuetify</a>
             </p>
-            <p>源代码地址：<a href="https://github.com/hzxszsk" v-electron-link>github</a></p>
+            <p>源代码地址：<a href="https://github.com/hzxszsk/ks-comic-download" v-electron-link>github</a></p>
           </v-flex>
         </v-card-title>
       </v-card>

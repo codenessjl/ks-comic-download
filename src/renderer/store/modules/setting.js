@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import util from 'util'
+import { remote } from 'electron';
 import { ls } from '../../plugins/storage'
 import path from 'path'
 import fs from 'fs-extra'
@@ -7,7 +8,7 @@ import fs from 'fs-extra'
 const state = {
   themeColor: 'light-blue',
   usingSourceName: 'dongmanzhijia',
-  savePath: path.join(__static, '../download'),
+  savePath: remote.app.getPath('downloads'),
   isNeedDesktopNotice: false,
   backgroundImageSrc: path.join(__static, './background.jpg')
 }

@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <v-app :style="appBackground">
     <!-- 侧边导航栏 -->
     <v-navigation-drawer temporary app v-model="drawer">
       <v-list>
@@ -51,7 +51,9 @@
           </v-btn>
           <v-list dense class="notice-list">
             <v-subheader v-if="!haveNotice">暂无下载完成消息</v-subheader>
-            <v-btn absolute right icon flat v-show="haveNotice" @click="clearNotices"><v-icon>delete</v-icon></v-btn>
+            <div class="button-wrap">
+              <v-btn icon flat v-show="haveNotice" @click="clearNotices"><v-icon>delete</v-icon></v-btn>
+            </div>
             <v-list-tile avatar v-for="(notice, index) in notices" :key="index">
               <v-list-tile-avatar>
                 <v-avatar><img :src="notice.coverUrl"></v-avatar>
@@ -69,7 +71,7 @@
         </v-menu>
       </div>
     </v-toolbar>
-    <main :style="appBackground">
+    <main>
       <v-content>
         <v-container fluid fill-height>
           <transition name="page" appear mode="out-in">
@@ -141,8 +143,7 @@ export default {
       const bgData = this.$store.getters['setting/backgroundImageData']
       return {
         backgroundImage: `url(${bgData})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center'
+        backgroundSize: '100% auto'
       }
     },
     haveNotice () {
@@ -226,5 +227,12 @@ html, body {
   min-width: 200px;
   min-height: 50px;
   max-height: 90vh;
+}
+.button-wrap {
+  overflow: hidden;
+  position: relative;
+}
+.button-wrap button {
+  float: right;
 }
 </style>

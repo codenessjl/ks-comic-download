@@ -113,7 +113,7 @@ export default class DMZJSpider extends BasicSpider {
     const chapterURL = chapter.url
     const res = await request.get(chapterURL)
     if (!res.ok) {
-      throw new Error('无法获取该章节图片信息')
+      throw new Error('无法获取该章节图片列表信息')
     } else {
       const $ = cheerio.load(res.text)
       const script = $('script').eq(0).html()

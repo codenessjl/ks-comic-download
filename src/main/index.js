@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, Tray } from 'electron'
+import { app, BrowserWindow, ipcMain, Menu } from 'electron'
 import { autoUpdater } from 'electron-updater'
 import fs from 'fs-extra'
 import path from 'path'
@@ -80,10 +80,17 @@ function bindIpcMain() {
     const finish = function finish() {
       sender.send('download-finish', utils.ipcMsg.success(null))
     }
+    const error = function error(err) {
+      sender.send('download-error', utils.ipcMsg.success(err.message))
+    }
     // 生成存储文件夹
     savePath = path.join(savePath, entity.comicName, entity.sectionTitle, entity.chapter.title)
     await fs.ensureDir(savePath)
-    spider.downloadChapter(entity, savePath, {init, update, finish})
+    try {
+      await spider.downloadChapter(entity, savePath, {init, update, finish, error})
+    } catch (err) {
+      error(err)
+    }
   })
 }
 
