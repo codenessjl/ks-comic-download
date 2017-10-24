@@ -22,3 +22,23 @@ build_script:
   - npm run dist
 
 test: off
+
+artifacts:
+  - path: ./build/*.exe
+    name: app
+
+deploy:
+  - provider: GitHub
+    artifact: app
+    draft: false
+    prerelease: false
+    
+    auth_token:
+      secure: 'IsKr0AtO6hjno56ZSNFBwJXx+XvmrB50sZhWC4bsIC3YKXh2vYFvGECHg2pwLlS6'
+      
+    on:
+      appveyor_repo_tag: true
+
+# environment:
+#   GH_TOKEN:
+#     secure: IsKr0AtO6hjno56ZSNFBwJXx+XvmrB50sZhWC4bsIC3YKXh2vYFvGECHg2pwLlS6
