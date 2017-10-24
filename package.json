@@ -17,14 +17,16 @@
     "postinstall": "electron-builder install-app-deps"
   },
   "build": {
-    "productName": "ks-comic-download",
+    "productName": "KS漫画下载工具",
     "appId": "pers.kainstar.ks-comic-download",
     "directories": {
       "output": "build"
     },
     "nsis": {
       "oneClick": false,
-      "allowToChangeInstallationDirectory": true
+      "allowToChangeInstallationDirectory": true,
+      "installerLanguages": "zh_CN",
+      "language": "2052"
     },
     "files": [
       "dist/electron/**/*"

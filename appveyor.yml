@@ -1,4 +1,4 @@
-version: 0.1.{build}
+version: 1.0.{build}
 
 branches:
   only:
@@ -19,12 +19,11 @@ init:
 
 install:
   - ps: Install-Product node 8 x64
-  - choco install yarn --ignore-dependencies
   - git reset --hard HEAD
-  - yarn
   - node --version
+  - npm install
 
 build_script:
-  - yarn build
+  - npm run build
 
 test: off
