@@ -24,7 +24,7 @@ export default class BasicSpider {
    * @async
    * @param {String} keyword 
    * @memberof BasicSpider
-   * @returns {Comic}
+   * @returns {Array<Comic>}
    */
   async search (keyword) {}
 
