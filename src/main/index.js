@@ -1,5 +1,4 @@
 import { app, BrowserWindow, ipcMain, Menu } from 'electron'
-import { autoUpdater } from 'electron-updater'
 import fs from 'fs-extra'
 import path from 'path'
 import Spider from './spiders'
@@ -128,10 +127,10 @@ app.on('activate', () => {
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-electron-builder.html#auto-updating
  */
 
-autoUpdater.on('update-downloaded', () => {
-  autoUpdater.quitAndInstall()
-})
+// autoUpdater.on('update-downloaded', () => {
+//   autoUpdater.quitAndInstall()
+// })
 
-app.on('ready', () => {
-  if (process.env.NODE_ENV === 'production') autoUpdater.checkForUpdates()
-})
+// app.on('ready', () => {
+//   if (process.env.NODE_ENV === 'production') autoUpdater.checkForUpdates()
+// })
