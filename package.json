@@ -1,6 +1,6 @@
 {
   "name": "ks-comic-download",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "author": "KainStar",
   "description": "a comic download app",
   "license": "MIT",
@@ -62,7 +62,7 @@
     "css-loader": "^0.28.4",
     "del": "^3.0.0",
     "devtron": "^1.4.0",
-    "electron": "^1.8.0",
+    "electron": "^1.7.9",
     "electron-builder": "^19.19.1",
     "electron-debug": "^1.4.0",
     "electron-devtools-installer": "^2.2.0",

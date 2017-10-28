@@ -142,7 +142,7 @@ export default {
     appBackground () {
       const bgData = this.$store.getters['setting/backgroundImageData']
       return {
-        backgroundImage: `url(${bgData})`,
+        backgroundImage: bgData,
         backgroundSize: '100% auto'
       }
     },

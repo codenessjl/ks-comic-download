@@ -23,8 +23,8 @@ const winURL = process.env.NODE_ENV === 'development'
 function createWindow () {
 
   mainWindow = new BrowserWindow({
-    width: 800,
-    height: 540,
+    width: 900,
+    height: 600,
     useContentSize: true,
     webPreferences: {
       webSecurity: false
@@ -35,6 +35,8 @@ function createWindow () {
   mainWindow.on('closed', () => {
     mainWindow = null
   })
+  
+  // mainWindow.webContents.openDevTools()
 }
 
 /**

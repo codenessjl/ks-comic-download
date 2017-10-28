@@ -5,6 +5,8 @@ import { ls } from '../../plugins/storage'
 import path from 'path'
 import fs from 'fs-extra'
 
+const DEFAULT_LINEAR_BG = `linear-gradient(to left, rgba(93, 213, 245, 0.5), rgba(89, 234, 167, 0.5))`
+
 const state = {
   themeColor: 'light-blue',
   usingSourceName: 'dongmanzhijia',
@@ -21,8 +23,16 @@ const getters = {
     return source
   },
   backgroundImageData (state) {
-    const ext = path.extname(state.backgroundImageSrc)
-    return `data:image/${ext === 'jpg' ? 'jpeg' : 'png'};base64,${fs.readFileSync(state.backgroundImageSrc).toString('base64')}`
+    let data
+    try {
+      let base64data = fs.readFileSync(state.backgroundImageSrc).toString('base64')
+      const ext = path.extname(state.backgroundImageSrc)
+      data = `url(data:image/${ext === 'jpg' ? 'jpeg' : 'png'};base64,${base64data})`
+    } catch (error) {
+      // 读取背景图片失败时
+      data = DEFAULT_LINEAR_BG
+    }
+    return data
   }
 }
 
