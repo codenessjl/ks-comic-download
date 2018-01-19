@@ -22,7 +22,7 @@
       </v-flex>
       <v-flex v-else xs12 v-for="(section, iSection) in comic.sections" :key="iSection">
         <v-card class="bg-opacity elevation-2">
-          <v-btn class="btn-fr" :color="themeColor" @click="selectAllChapters(section.chapters)" flat>选择全部</v-btn>
+          <v-btn class="btn-fr" :color="themeColor" @click="selectAllChapters(iSection)" flat>选择全部</v-btn>
           <v-subheader>{{section.sectionTitle}}</v-subheader>
           <v-container fluid grid-list-md>
             <v-layout row wrap>
@@ -71,10 +71,9 @@ export default {
     }
   },
   methods: {
-    selectAllChapters (chapters) {
-      chapters.forEach((chapter) => {
-        chapter.selected = true
-      })
+    selectAllChapters (iSection) {
+      console.log(iSection)
+      this.$store.commit('comic/selectAllChapters', iSection)
     },
     toggleChapter (iSection, iChapter) {
       this.$store.commit('comic/toggleChapter', {
@@ -101,6 +100,7 @@ export default {
   },
   created () {
     let currentWatchIndex = this.$store.state.comic.list.indexOf(this.$route.params.comic)
+    console.log(currentWatchIndex)
     this.$store.commit('comic/setCurrentWatchIndex', currentWatchIndex)
     this.$ipc.on('getComicSections-res', ({ event, store, router }, data) => {
       store.commit('comic/setComicSections', data)

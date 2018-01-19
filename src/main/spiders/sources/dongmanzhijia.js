@@ -11,7 +11,7 @@ import * as utils from '../../utils'
 
 /**
  * 解析漫画图片地址用
- * @returns 
+ * @returns
  */
 function decodeImgUrl(p, a, c, k, e, d) {
 	e = function (c) {
@@ -39,9 +39,9 @@ function decodeImgUrl(p, a, c, k, e, d) {
 
 /**
  * Unicode转可读字符串
- * 
- * @param {String} unicodeStr 
- * @returns 
+ *
+ * @param {String} unicodeStr
+ * @returns
  */
 function decodeUnicode(unicodeStr) {
 	return unescape(unicodeStr.replace(/\\(u[0-9a-fA-F]{4})/gm, '%$1'))
@@ -76,8 +76,8 @@ export default class DMZJSpider extends BasicSpider {
 
   /**
    * 获取封面图片，并保存到缓存文件夹中
-   * 
-   * @param {String} coverUrl 
+   *
+   * @param {String} coverUrl
    * @returns {Promise<String>}
    * @memberof DMZJSpider
    */
@@ -103,9 +103,9 @@ export default class DMZJSpider extends BasicSpider {
 
   /**
    * 获取一个章节的漫画图片地址数组
-   * 
+   *
    * @async
-   * @param {any} chapter 
+   * @param {any} chapter
    * @returns {Promise<String[]>}
    */
   async getComicPicUrl (chapter) {
@@ -130,15 +130,15 @@ export default class DMZJSpider extends BasicSpider {
 
 
   /**
-   * 
+   *
    * @override
-   * @param {String} keyword 
-   * @returns 
+   * @param {String} keyword
+   * @returns
    * @memberof DMZJSpider
    */
   async search (keyword) {
     const {request, searchUrl, header} = this
-    const res = await request.get(searchUrl).set(header).accept('json').query({s: keyword})
+    const res = await request.get(searchUrl).set(header).accept('json').query({s: keyword}).timeout(5000)
     if (res.ok) {
       // 获取漫画信息列表
       let comicList = res.text.substring(res.text.indexOf('['), res.text.length - 1)
@@ -146,11 +146,11 @@ export default class DMZJSpider extends BasicSpider {
       comicList = JSON.parse(decodeUnicode(comicList))
       const result = []
       for (let comic of comicList) {
-        let coverUrl = await this.fetchCoverImg(comic.comic_cover)
+        let coverUrl = await this.fetchCoverImg(utils.webUrlFix(comic.comic_cover))
         result.push({
           name: comic.comic_name,
           author: comic.authors,
-          siteUrl: comic.comic_url,
+          siteUrl: utils.webUrlFix(comic.comic_url),
           coverUrl: coverUrl,
           desc: comic.description,
           country: comic.zone,
@@ -164,10 +164,10 @@ export default class DMZJSpider extends BasicSpider {
   }
 
   /**
-   * 
+   *
    * @override
-   * @param {Comic} comic 
-   * @returns 
+   * @param {Comic} comic
+   * @returns
    * @memberof DMZJSpider
    */
   async getComicSections (comic) {
@@ -183,7 +183,7 @@ export default class DMZJSpider extends BasicSpider {
           chapters: []
         }
         $(cartoon).find('ul li').each((i, item) => {
-          const $item = $(item).find('a');
+          const $item = $(item).find('a')
           section.chapters.push({
             title: $item.text(),
             url: url.resolve(webUrl, $item.attr('href'))
@@ -199,11 +199,11 @@ export default class DMZJSpider extends BasicSpider {
 
   /**
    * 下载单张图片
-   * 
+   *
    * @param {String} folder 保存图片用路径
    * @param {String} picUrl 图片网络地址
    * @param {Function} finish async回调函数
-   * @returns 
+   * @returns
    */
   async downLoad(folder, picUrl) {
     const {request, imgHeader} = this
@@ -228,10 +228,10 @@ export default class DMZJSpider extends BasicSpider {
 
 
   /**
-   * 
+   *
    * @override
-   * @param {any} entity 
-   * @param {any} savePath 
+   * @param {any} entity
+   * @param {any} savePath
    * @param {any} operate
    * @memberof DMZJSpider
    */

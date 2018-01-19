@@ -12,18 +12,22 @@ import electron from 'electron'
 
 /**
  * 生成一个响应事件handler
- * 
- * @param {Function} callback 
+ *
+ * @param {Function} callback
  * @returns {Function}
  */
 function responseHandlerGenerate (callback) {
   /**
    * 生成的响应事件handler
-   * 
-   * @param {electron.Event} event 
-   * @param {IpcEventResponseEntity} res 
+   *
+   * @param {electron.Event} event
+   * @param {IpcEventResponseEntity} res
    */
   const responseHandler = (event, res) => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log(event)
+      console.log(res)
+    }
     if (res.success) {
       callback.call(null, { event, store, router }, res.data)
     } else {
@@ -38,9 +42,9 @@ function responseHandlerGenerate (callback) {
 
 /**
  * 封装ipcRenderer的 on 事件绑定
- * 
- * @param {String} channel 
- * @param {Function} callback 
+ *
+ * @param {String} channel
+ * @param {Function} callback
  */
 const on = function on(channel, callback) {
   ipcRenderer.on(channel, responseHandlerGenerate(callback))
@@ -53,8 +57,8 @@ const on = function on(channel, callback) {
 
 /**
  * 封装ipcRenderer的 removeAllListeners 方法
- * 
- * @param {String} channel 
+ *
+ * @param {String} channel
  */
 const clear = function clear(channel) {
   ipcRenderer.removeAllListeners(channel)
@@ -62,8 +66,8 @@ const clear = function clear(channel) {
 
 /**
  * 发送异步信息
- * 
- * @param {String} channel 
+ *
+ * @param {String} channel
  */
 const send = function send(channel, ...args) {
   ipcRenderer.send(channel, ...args)
@@ -71,8 +75,8 @@ const send = function send(channel, ...args) {
 
 /**
  * 发送同步信息
- * 
- * @param {String} channel 
+ *
+ * @param {String} channel
  */
 const sendSync = function sendSync(channel, ...args) {
   const res = ipcRenderer.sendSync(channel, ...args)

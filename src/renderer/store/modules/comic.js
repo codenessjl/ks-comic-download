@@ -46,6 +46,11 @@ const mutations = {
   toggleChapter (state, {iSection, iChapter}) {
     const chapter = state.list[state.currentWatchIndex].sections[iSection].chapters[iChapter]
     chapter.selected = !chapter.selected
+  },
+  selectAllChapters (state, iSection) {
+    state.list[state.currentWatchIndex].sections[iSection].forEach(chapter => {
+      chapter.selected = true
+    })
   }
 }
 

@@ -5,8 +5,8 @@ import crypto from 'crypto'
 export const ipcMsg = {
   /**
    * 返回一个ipc成功消息
-   * 
-   * @param {any} data 
+   *
+   * @param {any} data
    * @returns {Object}
    */
   success (data) {
@@ -18,8 +18,8 @@ export const ipcMsg = {
   },
   /**
    * 返回一个ipc失败消息
-   * 
-   * @param {String} msg 
+   *
+   * @param {String} msg
    * @returns {Object}
    */
   failed (msg) {
@@ -35,7 +35,7 @@ const TEMP_DIR_NAME = 'KS_COMIC_TEMP'
 const TEMP_DIR = path.join(app.getPath('temp'), TEMP_DIR_NAME)
 /**
  * 获取缓存文件夹路径
- * 
+ *
  * @returns {String}
  */
 export function getTempDir () {
@@ -44,8 +44,8 @@ export function getTempDir () {
 
 /**
  * md5的字符串hash
- * 
- * @param {String} str 
+ *
+ * @param {String} str
  * @returns {String}
  */
 export function hash(str) {
@@ -54,9 +54,26 @@ export function hash(str) {
 }
 
 /**
+ * URL 补全
+ *
+ * @export
+ * @param {String} url
+ */
+export function webUrlFix(url) {
+  if (!url.startsWith('http')) {
+    if (url.startsWith('//')) {
+      url = 'http:' + url
+    } else {
+      url = 'http://' + url
+    }
+  }
+  return url
+}
+
+/**
  * 休眠一段时间
- * 
- * @param {Number} time 
+ *
+ * @param {Number} time
  * @returns {Promise}
  */
 export function sleep(time) {
